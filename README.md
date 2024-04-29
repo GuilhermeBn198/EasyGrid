@@ -8,4 +8,7 @@ Python project for sorting classes in dinamic Intervals based in mutual restrict
 
 ### for development
 
-```bash pip install wxPython Flask SQLAlchemy pytest´´´
+```bash
+    pip install wxPython Flask SQLAlchemy flask_sqlalchemy pytest 
+    pip install python-dotenv psycopg2
+```
