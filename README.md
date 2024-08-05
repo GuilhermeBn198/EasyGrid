@@ -1,14 +1,15 @@
 # EasyGrid
 
-Python project for sorting classes in dinamic Intervals based in mutual restrictions
+JS/TS project for sorting classes in dinamic Intervals based in mutual restrictions
 
 ## Instalation and configuration
 
+[WIP]
+
 ### for production
+
+[WIP]
 
 ### for development
 
-```bash
-    pip install wxPython Flask SQLAlchemy flask_sqlalchemy pytest 
-    pip install python-dotenv psycopg2
-```
+[WIP]

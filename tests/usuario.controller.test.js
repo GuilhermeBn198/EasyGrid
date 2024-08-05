@@ -22,7 +22,7 @@ describe('POST usuario/novaConta : METHOD create', ()=>{
                 
             expect(status).toBe(200)
             expect(bodyResponse).toHaveProperty('message')
-            expect(bodyResponse.message).toBe("sucesso")
+            expect(bodyResponse.message).toBe("sucesso") 
             
             
             } catch (/** @type {any} */ error) {
