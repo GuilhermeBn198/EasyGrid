@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import app from "../server.js";
+import app from "../src/server.ts";
 
 describe('POST usuario/novaConta : METHOD create', ()=>{
 

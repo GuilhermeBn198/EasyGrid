@@ -8,7 +8,7 @@ export default {
      * @param {import ("express").Response} res 
      */
 
-    create: async function  (req,res) {
+    create: async function  (req: { body: { email: any; senha: any; nome: any; dataNascimento: any } },res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { message?: string; error?: unknown }): any; new(): any } }; json: (arg0: { message: string }) => any }) {
         try {
         
         const { email,senha,nome,dataNascimento } = req.body
