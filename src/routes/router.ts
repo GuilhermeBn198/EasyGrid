@@ -1,5 +1,5 @@
 import { Router } from "express";
-import usuarioController from "../controllers/usuario.controller.ts";
+// import usuarioController from "../controllers/usuario.controller.ts";
 import { body, validationResult } from "express-validator";
 import { loginUser, registerUser } from "../services/authService.ts";
 
@@ -27,7 +27,7 @@ router.post('/register',
       try {
         const user = await registerUser(email, nome, senha, tipo);
         res.status(201).json(user);
-      } catch (err) {
+      } catch (err:any) {
         res.status(500).json({ error: err.message });
       }
     }
@@ -48,14 +48,14 @@ router.post('/register',
       try {
         const { token, user } = await loginUser(email, senha);
         res.status(200).json({ token, user });
-      } catch (err) {
+      } catch (err:any) {
         res.status(401).json({ error: 'Invalid email or password' });
       }
     }
   );
 
 //rotas do usuario
-router.post('/usuario/novaConta', usuarioController.create)
+// router.post('/usuario/novaConta', usuarioController.create)
 // router.get('/usuario/novaConta', usuarioController.create)
 // router.put('/usuario/{:id}', usuarioController.create)
 // router.delete('/usuario/{:id}', usuarioController.create)
