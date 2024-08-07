@@ -9,14 +9,16 @@ const JWT_SECRET = 'your_secret_key'; // Troque por uma chave secreta mais segur
 export const registerUser = async (email: string, nome: string, senha: string, tipo: number) => {
   const hashedPassword = await bcrypt.hash(senha, 10);
   const user = await prisma.user.create({
-    data: {
-      email,
-      nome,
-      senha: hashedPassword,
-      tipo,
-    },
+      data: {
+          email,
+          nome,
+          senha: hashedPassword,
+          tipo,
+      },
   });
-  return user;
+
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+  return { token, user };
 };
 
 export const loginUser = async (email: string, senha: string) => {
