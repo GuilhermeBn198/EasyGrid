@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import router from './routes/router';
 import errorHandler from './middleware/errorHandler';
 
@@ -10,9 +11,29 @@ app.use('/api', router);
 // Middleware de manipulação de erros
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Initial port
+let PORT = process.env.PORT || "3000";
+
+// Function to start the server
+const startServer = (PORT: string) => {
+  const server = http.createServer(app);
+
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+
+  // Handle EADDRINUSE error
+  server.on('error', (error) => {
+    if (error.name === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use.`);
+      const newPort = "3001"; // Alternative port
+      console.log(`Attempting to start server on port ${newPort} instead.`);
+      startServer(newPort); // Try starting the server on thez alternative port
+    }
+  });
+};
+
+// Start the server
+startServer(PORT);
 
 export default app;

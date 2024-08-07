@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 import { loginUser, registerUser } from "../services/authService";
 import AppError from "../utils/AppError";
+import { authenticateToken } from "../middleware/authMiddleware";
+import * as semesterController from "../controllers/semester.controller";
 const router = Router();
 
 // landing page data
@@ -29,8 +31,13 @@ router.post(
 
         const { email, nome, senha, tipo } = req.body;
         try {
-            const user = await registerUser(email, nome, senha, tipo);
-            res.status(201).json(user);
+            const { token, user } = await registerUser(
+                email,
+                nome,
+                senha,
+                tipo
+            );
+            res.status(201).json({ token, user });
         } catch (err: any) {
             next(new AppError(err.message, 500));
         }
@@ -57,6 +64,46 @@ router.post(
             next(err);
         }
     }
+);
+
+// rotas protegidas pelo middleware de autenticação
+router.get("/protected", authenticateToken, (req: Request, res: Response) => {
+    //verificação do middleware
+    res.status(200).json({ message: "Acesso concedido", user: req.user });
+});
+
+router.post(
+    "/semester",
+    authenticateToken,
+    [
+        body("nome").notEmpty().withMessage("Nome é obrigatório"),
+        body("prioridade")
+            .isInt()
+            .withMessage("Prioridade deve ser um número inteiro"),
+    ],
+    semesterController.createSemester
+);
+router.get("/semester", authenticateToken, semesterController.getSemesters);
+router.get(
+    "/semester/:id",
+    authenticateToken,
+    semesterController.getSemesterById
+);
+router.put(
+    "/semester/:id",
+    authenticateToken,
+    [
+        body("nome").notEmpty().withMessage("Nome é obrigatório"),
+        body("prioridade")
+            .isInt()
+            .withMessage("Prioridade deve ser um número inteiro"),
+    ],
+    semesterController.updateSemester
+);
+router.delete(
+    "/semester/:id",
+    authenticateToken,
+    semesterController.deleteSemester
 );
 
 //rotas do usuario

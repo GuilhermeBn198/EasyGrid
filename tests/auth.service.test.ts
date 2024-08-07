@@ -1,6 +1,5 @@
 import supertest from "supertest";
 import app from "../src/server";
-import { error } from "console";
 
 describe("Auth Routes", () => {
     describe("POST /register", () => {
