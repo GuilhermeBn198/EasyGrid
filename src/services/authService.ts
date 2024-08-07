@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import AppError from '../utils/AppError';
 
 const prisma = new PrismaClient();
-
 const JWT_SECRET = 'your_secret_key'; // Troque por uma chave secreta mais segura
 
 export const registerUser = async (email: string, nome: string, senha: string, tipo: number) => {
@@ -25,7 +25,7 @@ export const loginUser = async (email: string, senha: string) => {
   });
 
   if (!user || !(await bcrypt.compare(senha, user.senha))) {
-    throw new Error('Invalid email or password');
+    throw new AppError('Email ou senha inválidos', 401);
   }
 
   const token = jwt.sign({ userId: user.id, tipo: user.tipo }, JWT_SECRET, { expiresIn: '1h' });
