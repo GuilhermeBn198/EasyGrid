@@ -11,6 +11,7 @@ export const createSemester = async (req: Request, res: Response, next: NextFunc
     const semester = await prisma.semester.create({
       data: { nome, prioridade },
     });
+    console.log(semester.nome+"criacao semestre");
     res.status(201).json(semester);
   } catch (err: any) {
     next(new AppError(err.message, 500));
@@ -20,6 +21,7 @@ export const createSemester = async (req: Request, res: Response, next: NextFunc
 export const getSemesters = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const semesters = await prisma.semester.findMany();
+    console.log(semesters+"todos os ids")
     res.status(200).json(semesters);
   } catch (err: any) {
     next(new AppError(err.message, 500));
@@ -34,6 +36,8 @@ export const getSemesterById = async (req: Request, res: Response, next: NextFun
     if (!semester) {
       return next(new AppError('Semester not found', 404));
     }
+    console.log(semester.nome+"id unico ok");
+    
     res.status(200).json(semester);
   } catch (err: any) {
     next(new AppError(err.message, 500));

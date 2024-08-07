@@ -66,7 +66,7 @@ router.post(
     }
 );
 
-// rotas protegidas pelo middleware de autenticação
+//////////////////////////////////////////////////// rotas protegidas pelo middleware de autenticação
 router.get("/protected", authenticateToken, (req: Request, res: Response) => {
     //verificação do middleware
     res.status(200).json({ message: "Acesso concedido", user: req.user });
@@ -84,14 +84,8 @@ router.post(
     semesterController.createSemester
 );
 router.get("/semester", authenticateToken, semesterController.getSemesters);
-router.get(
-    "/semester/:id",
-    authenticateToken,
-    semesterController.getSemesterById
-);
-router.put(
-    "/semester/:id",
-    authenticateToken,
+router.get("/semester/:id", authenticateToken, semesterController.getSemesterById);
+router.put("/semester/:id", authenticateToken,
     [
         body("nome").notEmpty().withMessage("Nome é obrigatório"),
         body("prioridade")
@@ -100,11 +94,7 @@ router.put(
     ],
     semesterController.updateSemester
 );
-router.delete(
-    "/semester/:id",
-    authenticateToken,
-    semesterController.deleteSemester
-);
+router.delete("/semester/:id", authenticateToken, semesterController.deleteSemester);
 
 //rotas do usuario
 // router.post('/usuario/novaConta', usuarioController.create)
