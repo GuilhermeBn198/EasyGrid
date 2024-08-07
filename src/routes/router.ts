@@ -1,8 +1,7 @@
-import { Router } from "express";
-// import usuarioController from "../controllers/usuario.controller.ts";
-import { body, validationResult } from "express-validator";
-import { loginUser, registerUser } from "../services/authService.ts";
-
+import { Router, Request, Response, NextFunction } from 'express';
+import { body, validationResult } from 'express-validator';
+import { loginUser, registerUser } from '../services/authService';
+import AppError from '../utils/AppError';
 const router = Router();
 
 // landing page data
@@ -11,48 +10,48 @@ const router = Router();
 
 //rotas login usuario
 router.post('/register', 
-    [
-      body('email').isEmail(),
-      body('nome').notEmpty(),
-      body('senha').isLength({ min: 6 }),
-      body('tipo').isIn([1, 2]), // 1 para Professor, 2 para Coordenador
-    ],
-    async (req, res) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-  
-      const { email, nome, senha, tipo } = req.body;
-      try {
-        const user = await registerUser(email, nome, senha, tipo);
-        res.status(201).json(user);
-      } catch (err:any) {
-        res.status(500).json({ error: err.message });
-      }
+  [
+    body('email').isEmail().withMessage('Email inválido'),
+    body('nome').notEmpty().withMessage('Nome é obrigatório'),
+    body('senha').isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres'),
+    body('tipo').isIn([1, 2]).withMessage('Tipo deve ser 1 (Professor) ou 2 (Coordenador)'),
+  ],
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new AppError('Dados inválidos', 400));
     }
-  );
-  
-  router.post('/login', 
-    [
-      body('email').isEmail(),
-      body('senha').notEmpty(),
-    ],
-    async (req, res) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-  
-      const { email, senha } = req.body;
-      try {
-        const { token, user } = await loginUser(email, senha);
-        res.status(200).json({ token, user });
-      } catch (err:any) {
-        res.status(401).json({ error: 'Invalid email or password' });
-      }
+
+    const { email, nome, senha, tipo } = req.body;
+    try {
+      const user = await registerUser(email, nome, senha, tipo);
+      res.status(201).json(user);
+    } catch (err: any) {
+      next(new AppError(err.message, 500));
     }
-  );
+  }
+);
+
+router.post('/login', 
+  [
+    body('email').isEmail().withMessage('Email inválido'),
+    body('senha').notEmpty().withMessage('Senha é obrigatória'),
+  ],
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new AppError('Dados inválidos', 400));
+    }
+
+    const { email, senha } = req.body;
+    try {
+      const { token, user } = await loginUser(email, senha);
+      res.status(200).json({ token, user });
+    } catch (err: any) {
+      next(new AppError('Email ou senha inválidos', 401));
+    }
+  }
+);
 
 //rotas do usuario
 // router.post('/usuario/novaConta', usuarioController.create)
