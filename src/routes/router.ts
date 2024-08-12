@@ -4,13 +4,14 @@ import { loginUser, registerUser } from "../services/authService";
 import AppError from "../utils/AppError";
 import { authenticateToken } from "../middleware/authMiddleware";
 import * as semesterController from "../controllers/semester.controller";
+import * as userController from "../controllers/usuario.controller";
+
 const router = Router();
 
 // landing page data
 // router.get('/', )
 
-//rotas login usuario
-
+//////////////////////////////////////////////////// Rotas de autenticação
 router.post(
     "/register",
     [
@@ -43,7 +44,6 @@ router.post(
         }
     }
 );
-
 router.post(
     "/login",
     [
@@ -66,12 +66,14 @@ router.post(
     }
 );
 
-//////////////////////////////////////////////////// rotas protegidas pelo middleware de autenticação
+//////////////////////////////////////////////////// Rotas teste de middleware
 router.get("/protected", authenticateToken, (req: Request, res: Response) => {
     //verificação do middleware
     res.status(200).json({ message: "Acesso concedido", user: req.user });
 });
 
+
+////////////////////////////////////////////////////  Rotas CRUD para Semesters(protegidas)
 router.post(
     "/semester",
     authenticateToken,
@@ -96,10 +98,26 @@ router.put("/semester/:id", authenticateToken,
 );
 router.delete("/semester/:id", authenticateToken, semesterController.deleteSemester);
 
-//rotas do usuario
-// router.post('/usuario/novaConta', usuarioController.create)
-// router.get('/usuario/novaConta', usuarioController.create)
-// router.put('/usuario/{:id}', usuarioController.create)
-// router.delete('/usuario/{:id}', usuarioController.create)
+////////////////////////////////// Rotas CRUD para criação de usuarios(por administradores) 
+router.post(
+    "/usuario",
+    authenticateToken,
+    [
+        body("email").isEmail().withMessage("Email inválido"),
+        body("nome").notEmpty().withMessage("Nome é obrigatório"),
+        body("senha")
+            .isLength({ min: 6 })
+            .withMessage("Senha deve ter no mínimo 6 caracteres"),
+        body("tipo")
+            .isIn([1, 2])
+            .withMessage("Tipo deve ser 1 (Professor) ou 2 (Coordenador)"),
+    ],
+    userController.createUser
+);
+
+router.get("/usuario", authenticateToken, userController.getUsers);
+router.get("/usuario/:id", authenticateToken, userController.getUserById);
+router.put("/usuario/:id", authenticateToken, userController.updateUser);
+router.delete("/usuario/:id", authenticateToken, userController.deleteUser);
 
 export default router;

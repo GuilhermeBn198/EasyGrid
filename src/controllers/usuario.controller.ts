@@ -1,50 +1,96 @@
+import { Request, Response, NextFunction } from 'express';
+import { PrismaClient } from '@prisma/client';
+import { registerUser } from '../services/authService';
+import AppError from '../utils/AppError';
 
-// export default {
-//     /**
-//      *
-//      * @param {import ("express").Request} req
-//      * @param {import ("express").Response} res
-//      */
+const prisma = new PrismaClient();
 
-//     create: async function (
-//         req: {
-//             body: { email: any; senha: any; nome: any; dataNascimento: any };
-//         },
-//         res: {
-//             status: (arg0: number) => {
-//                 (): any;
-//                 new (): any;
-//                 json: {
-//                     (arg0: { message?: string; error?: unknown }): any;
-//                     new (): any;
-//                 };
-//             };
-//             json: (arg0: { message: string }) => any;
-//         }
-//     ) {
-//         try {
-//             const { email, senha, nome, dataNascimento } = req.body;
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, nome, senha, tipo } = req.body;
 
-//             if (!(email && senha && nome && dataNascimento)) {
-//                 return res
-//                     .status(400)
-//                     .json({ message: "Os campos são obrigatorios" });
-//             }
+        if (!req.user || req.user.tipo !== 2) {
+            throw new AppError('Acesso negado. Apenas coordenadores podem criar usuários.', 403);
+        }
 
-//             const RES_DATABASE = await pool.query(
-//                 'INSERT INTO "USUARIO"("nome","email","senha","dataNascimento") VALUES($1,$2,$3,$4) RETURNING *',
-//                 [nome, email, senha, dataNascimento]
-//             );
+        const { user } = await registerUser(email, nome, senha, tipo);
+        res.status(201).json(user);
+    } catch (error) {
+        next(error);
+    }
+};
 
-//             const dbData = RES_DATABASE.rows[0];
+export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const users = await prisma.user.findMany({
+            where: { tipo: 1 }
+        });
+        res.status(200).json(users);
+    } catch (error) {
+        next(error);
+    }
+};
 
-//             if (!dbData) {
-//                 throw new Error("Não foi inserido");
-//             }
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
 
-//             return res.json({ message: "sucesso" });
-//         } catch (error) {
-//             return res.status(500).json({ error });
-//         }
-//     },
-// };
+        // Convertendo o id para número inteiro
+        const userId = parseInt(id, 10);
+
+        // Verificar se a conversão foi bem-sucedida
+        if (isNaN(userId)) {
+            return next(new AppError('ID inválido', 400));
+        }
+
+        // Encontrar o usuário no banco de dados
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId, // Passar id corretamente
+            },
+        });
+
+        if (!user) {
+            throw new AppError('Usuário não encontrado', 404);
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const { nome, email, senha } = req.body;
+
+        if (!req.user || req.user.tipo !== 2) {
+            throw new AppError('Acesso negado. Apenas coordenadores podem atualizar usuários.', 403);
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: Number(id), tipo: 1 },
+            data: { nome, email, senha },
+        });
+
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+
+        if (!req.user || req.user.tipo !== 2) {
+            throw new AppError('Acesso negado. Apenas coordenadores podem deletar usuários.', 403);
+        }
+
+        await prisma.user.delete({ where: { id: Number(id), tipo: 1 } });
+        res.status(204).send();
+    } catch (error) {
+        next(error);
+    }
+};
