@@ -1,65 +1,84 @@
-// import supertest from "supertest";
-// import app from "../src/server.ts";
+import supertest from 'supertest';
+import app from '../src/server';
 
-// describe('POST usuario/novaConta : METHOD create', ()=>{
+describe("User CRUD", () => {
+    let adminToken: string;
+    let userId: number;
 
-//     it('Pass 200: O usuario deve ser criado',async ()=>{
-//         const bodyRequest = {
-//             nome: 'Pablo',
-//             email: 'p@p.com',
-//             senha: '123',
-//             dataNascimento: '1997-09-05'
-//         } 
+    beforeAll(async () => {
+        // Registrar um usuário administrador
+        const adminRes = await supertest(app).post("/api/register").send({
+            email: `admin${Date.now()}@test.com`,
+            nome: "Admin User",
+            senha: "password",
+            tipo: 2,
+        });
+        adminToken = adminRes.body.token;
+    });
 
-//         const res = await supertest(app)
-//         .post('/usuario/novaConta')
-//         .send(bodyRequest)
+    it("should create a new user", async () => {
+        const res = await supertest(app)
+            .post("/api/usuario")
+            .set("Authorization", `Bearer ${adminToken}`)
+            .send({
+                email: `user${Date.now()}@test.com`,
+                nome: "Test User",
+                senha: "password",
+                tipo: 1,
+            });
 
-//         const {status} = res
-//         const bodyResponse = res.body
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty("id");
+        expect(res.body).toHaveProperty("nome", "Test User");
 
-//         try {
-                
-//             expect(status).toBe(200)
-//             expect(bodyResponse).toHaveProperty('message')
-//             expect(bodyResponse.message).toBe("sucesso") 
-            
-            
-//             } catch (/** @type {any} */ error) {
-//                 const details = {details: bodyResponse}
-//                 throw new Error(`${error.message} \n  ${JSON.stringify(details,null,2)}`)
-//             }
-//     })
+        userId = res.body.id;
+    });
 
-//     it('Error 400: Todos os campos devem ser obrigatorios', async ()=>{
-        
-//         const bodyRequest = 
-//             {
-//                 nome:'' ,
-//                 email:'' ,
-//                 senha:'' ,
-//                 dataNascimento:'' 
-//             }
-            
-//         const res = await supertest(app)
-//         .post('/usuario/novaConta')
-//         .send(bodyRequest)
-        
-//         const {body,status} = res
-        
-//         try {
-                
-//         expect(status).toBe(400)
-//         expect(body).toHaveProperty('message')
-//         expect(body.message).toBe('Os campos são obrigatorios')
-            
-//         } catch (/** @type {any} */ error) {
-//             const details = {details: body}
-//             throw new Error(`${error.message} \n  ${JSON.stringify(details,null,2)}`)
-//         }
+    it("should get all users", async () => {
+        const res = await supertest(app)
+            .get("/api/usuario")
+            .set("Authorization", `Bearer ${adminToken}`);
 
+        expect(res.status).toBe(200);
+        expect(res.body).toBeInstanceOf(Array);
+    });
 
-//     })
+    it("should get a user by ID", async () => {
+        const res = await supertest(app)
+            .get(`/api/usuario/${userId}`)
+            .set("Authorization", `Bearer ${adminToken}`);
 
-   
-// })
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("id", userId);
+        expect(res.body).toHaveProperty("nome", "Test User");
+    });
+
+    it("should update a user", async () => {
+        const res = await supertest(app)
+            .put(`/api/usuario/${userId}`)
+            .set("Authorization", `Bearer ${adminToken}`)
+            .send({
+                nome: "Updated User",
+                email: `updated${Date.now()}@test.com`,
+                senha: "newpassword",
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("id", userId);
+        expect(res.body).toHaveProperty("nome", "Updated User");
+    });
+
+    it("should delete a user", async () => {
+        const res = await supertest(app)
+            .delete(`/api/usuario/${userId}`)
+            .set("Authorization", `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(204);
+
+        const getRes = await supertest(app)
+            .get(`/api/usuario/${userId}`)
+            .set("Authorization", `Bearer ${adminToken}`);
+
+        expect(getRes.status).toBe(404);
+    });
+});
