@@ -6,12 +6,12 @@ describe("User CRUD", () => {
     let userId: number;
 
     beforeAll(async () => {
-        // Registrar um usuário administrador
+        // Registrar um usuário coordenador
         const adminRes = await supertest(app).post("/api/register").send({
             email: `admin${Date.now()}@test.com`,
             nome: "Admin User",
             senha: "password",
-            tipo: 2,
+            tipo: 2, // Coordenador
         });
         adminToken = adminRes.body.token;
     });
@@ -24,7 +24,7 @@ describe("User CRUD", () => {
                 email: `user${Date.now()}@test.com`,
                 nome: "Test User",
                 senha: "password",
-                tipo: 1,
+                tipo: 1, // Professor
             });
 
         expect(res.status).toBe(201);

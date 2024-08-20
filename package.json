@@ -4,7 +4,7 @@
     "description": "JS/TS project for sorting classes in dinamic Intervals based in mutual restrictions",
     "main": "server.ts",
     "scripts": {
-        "test": "jest",
+        "test": "jest --detectOpenHandles",
         "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
     },
     "repository": {
