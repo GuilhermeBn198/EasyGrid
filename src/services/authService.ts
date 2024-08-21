@@ -17,19 +17,21 @@ export const registerUser = async (email: string, nome: string, senha: string, t
       },
   });
 
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+  // Inclua o tipo no payload do token
+  const token = jwt.sign({ userId: user.id, tipo: user.tipo }, JWT_SECRET, { expiresIn: '1h' });
   return { token, user };
 };
 
 export const loginUser = async (email: string, senha: string) => {
   const user = await prisma.user.findUnique({
-    where: { email },
+      where: { email },
   });
 
   if (!user || !(await bcrypt.compare(senha, user.senha))) {
-    throw new AppError('Email ou senha inválidos', 401);
+      throw new AppError('Email ou senha inválidos', 401);
   }
 
+  // Inclua o tipo no payload do token
   const token = jwt.sign({ userId: user.id, tipo: user.tipo }, JWT_SECRET, { expiresIn: '1h' });
   return { token, user };
 };

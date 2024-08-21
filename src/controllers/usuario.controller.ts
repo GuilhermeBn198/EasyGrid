@@ -13,8 +13,8 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
             throw new AppError('Acesso negado. Apenas coordenadores podem criar usuários.', 403);
         }
 
-        const { user } = await registerUser(email, nome, senha, tipo);
-        res.status(201).json(user);
+        const { token, user } = await registerUser(email, nome, senha, tipo);
+        res.status(201).json({token, user});
     } catch (error) {
         next(error);
     }
@@ -53,6 +53,8 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
         if (!user) {
             throw new AppError('Usuário não encontrado', 404);
         }
+        console.log("Authenticated User do usuario.controller.ts:", req.user);
+        console.log("User id recebido a partir de req.params do usuario.controller.ts:", id);
 
         res.status(200).json(user);
     } catch (error) {

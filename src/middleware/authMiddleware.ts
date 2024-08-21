@@ -21,8 +21,8 @@ export const authenticateToken = (
         if (err) {
             return next(new AppError("Token inválido ou expirado", 403));
         }
-
         req.user = user as any; // Remova o "as any" após configurar corretamente os tipos do usuário
+        console.log("Authenticated User do authMiddleware.ts:", req.user);
         next();
     });
 };
