@@ -3,25 +3,23 @@ import app from '../src/server';
 
 describe("Subject CRUD", () => {
   let token: string;
-  let semesterId: number;
   let subjectId: number;
+  let semesterId: number;
 
   beforeAll(async () => {
-    // Registra um usuário coordenador e obtém o token de autenticação
     const registerRes = await supertest(app).post("/api/register").send({
       email: `test${Date.now()}@test.com`,
-      nome: "Test Coordinator",
+      nome: "Test User",
       senha: "password",
       tipo: 2, // Coordenador
     });
     token = registerRes.body.token;
 
-    // Cria um semestre para associar a matéria
     const semesterRes = await supertest(app)
       .post("/api/semester")
       .set("Authorization", `Bearer ${token}`)
-      .send({ nome: "Spring 2025", prioridade: 1 });
-
+      .send({ nome: "semestre 1", prioridade: 1 });
+    
     semesterId = semesterRes.body.id;
   });
 
@@ -29,11 +27,17 @@ describe("Subject CRUD", () => {
     const res = await supertest(app)
       .post("/api/subject")
       .set("Authorization", `Bearer ${token}`)
-      .send({ nome: "Matemática", semesterId });
+      .send({ 
+        nome: "Estrutura de Dados",
+        horario: "24M12", // Exemplo de horário: Terça e Quarta, de 8h às 10h
+        semesterId 
+      });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty("id");
-    expect(res.body).toHaveProperty("nome", "Matemática");
+    expect(res.body).toHaveProperty("nome", "Estrutura de Dados");
+    expect(res.body).toHaveProperty("horario", "24M12");
+    expect(res.body).toHaveProperty("semestreId", semesterId);
 
     subjectId = res.body.id;
   });
@@ -54,18 +58,24 @@ describe("Subject CRUD", () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("id", subjectId);
-    expect(res.body).toHaveProperty("nome", "Matemática");
+    expect(res.body).toHaveProperty("nome", "Estrutura de Dados");
+    expect(res.body).toHaveProperty("horario", "24M12");
+    expect(res.body).toHaveProperty("semestreId", semesterId);
   });
 
   it("should update a subject", async () => {
     const res = await supertest(app)
       .put(`/api/subject/${subjectId}`)
       .set("Authorization", `Bearer ${token}`)
-      .send({ nome: "Matemática Avançada" });
+      .send({ 
+        nome: "Estrutura de Dados 2",
+        horario: "35T12" // Novo horário: Quarta e Quinta, de 14h às 16h
+      });
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("id", subjectId);
-    expect(res.body).toHaveProperty("nome", "Matemática Avançada");
+    expect(res.body).toHaveProperty("nome", "Estrutura de Dados 2");
+    expect(res.body).toHaveProperty("horario", "35T12");
   });
 
   it("should delete a subject", async () => {
