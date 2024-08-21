@@ -26,12 +26,12 @@ describe("User CRUD", () => {
                 senha: "password",
                 tipo: 1, // Professor
             });
-
+    
         expect(res.status).toBe(201);
-        expect(res.body).toHaveProperty("id");
-        expect(res.body).toHaveProperty("nome", "Test User");
-
-        userId = res.body.id;
+        expect(res.body.user).toHaveProperty("id");  // Modificado para res.body.user
+        expect(res.body.user).toHaveProperty("nome", "Test User");  // Modificado para res.body.user
+    
+        userId = res.body.user.id;  // Modificado para res.body.user
     });
 
     it("should get all users", async () => {

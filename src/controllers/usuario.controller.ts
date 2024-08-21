@@ -23,7 +23,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await prisma.user.findMany({
-            where: { tipo: 1 }
+            where: { tipo: 1 || 2 }
         });
         res.status(200).json(users);
     } catch (error) {
@@ -67,12 +67,12 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
         const { id } = req.params;
         const { nome, email, senha } = req.body;
 
-        if (!req.user || req.user.tipo !== 2) {
+        if (!req.user) {
             throw new AppError('Acesso negado. Apenas coordenadores podem atualizar usuários.', 403);
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: Number(id), tipo: 1 },
+            where: { id: Number(id) },
             data: { nome, email, senha },
         });
 
@@ -86,11 +86,11 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     try {
         const { id } = req.params;
 
-        if (!req.user || req.user.tipo !== 2) {
+        if (!req.user) {
             throw new AppError('Acesso negado. Apenas coordenadores podem deletar usuários.', 403);
         }
 
-        await prisma.user.delete({ where: { id: Number(id), tipo: 1 } });
+        await prisma.user.delete({ where: { id: Number(id) } });
         res.status(204).send();
     } catch (error) {
         next(error);
