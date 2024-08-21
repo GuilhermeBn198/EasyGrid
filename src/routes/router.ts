@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 import { loginUser, registerUser } from "../services/authService";
 import AppError from "../utils/AppError";
-import { authenticateToken } from "../middleware/authMiddleware";
+import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 import * as semesterController from "../controllers/semester.controller";
 import * as userController from "../controllers/usuario.controller";
 
@@ -72,11 +72,11 @@ router.get("/protected", authenticateToken, (req: Request, res: Response) => {
     res.status(200).json({ message: "Acesso concedido", user: req.user });
 });
 
-
 ////////////////////////////////////////////////////  Rotas CRUD para Semesters(protegidas)
 router.post(
     "/semester",
     authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem criar
     [
         body("nome").notEmpty().withMessage("Nome é obrigatório"),
         body("prioridade")
@@ -86,8 +86,15 @@ router.post(
     semesterController.createSemester
 );
 router.get("/semester", authenticateToken, semesterController.getSemesters);
-router.get("/semester/:id", authenticateToken, semesterController.getSemesterById);
-router.put("/semester/:id", authenticateToken,
+router.get(
+    "/semester/:id",
+    authenticateToken,
+    semesterController.getSemesterById
+);
+router.put(
+    "/semester/:id",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem criar
     [
         body("nome").notEmpty().withMessage("Nome é obrigatório"),
         body("prioridade")
@@ -96,9 +103,14 @@ router.put("/semester/:id", authenticateToken,
     ],
     semesterController.updateSemester
 );
-router.delete("/semester/:id", authenticateToken, semesterController.deleteSemester);
+router.delete(
+    "/semester/:id",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem criar
+    semesterController.deleteSemester
+);
 
-////////////////////////////////// Rotas CRUD para criação de usuarios(por administradores) 
+/////////////////////////////////////////////////// Rotas CRUD para criação de usuarios(protegidas)
 router.post(
     "/usuario",
     authenticateToken,

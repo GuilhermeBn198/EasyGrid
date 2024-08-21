@@ -21,8 +21,17 @@ export const authenticateToken = (
         if (err) {
             return next(new AppError("Token inválido ou expirado", 403));
         }
-        req.user = user as any; // Remova o "as any" após configurar corretamente os tipos do usuário
+        req.user = user as any; // Configuração correta dos tipos
         console.log("Authenticated User do authMiddleware.ts:", req.user);
         next();
     });
+};
+
+export const authorizeRole = (requiredRole: number) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        if (req.user?.tipo !== requiredRole) {
+            return next(new AppError("Acesso negado", 403));
+        }
+        next();
+    };
 };

@@ -21,7 +21,7 @@ export const createSemester = async (req: Request, res: Response, next: NextFunc
 export const getSemesters = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const semesters = await prisma.semester.findMany();
-    console.log(semesters+"todos os ids")
+    console.log([semesters]+"todos os ids")
     res.status(200).json(semesters);
   } catch (err: any) {
     next(new AppError(err.message, 500));
