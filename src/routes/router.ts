@@ -5,6 +5,7 @@ import AppError from "../utils/AppError";
 import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 import * as semesterController from "../controllers/semester.controller";
 import * as userController from "../controllers/usuario.controller";
+import * as subjectController from './controllers/subject.controller';
 
 const router = Router();
 
@@ -110,7 +111,7 @@ router.delete(
     semesterController.deleteSemester
 );
 
-/////////////////////////////////////////////////// Rotas CRUD para criação de usuarios(protegidas)
+/////////////////////////////////////////////////// Rotas CRUD para criação de usuarios(protegidas) por coordenadores
 router.post(
     "/usuario",
     authenticateToken,
@@ -133,3 +134,30 @@ router.put("/usuario/:id", authenticateToken, userController.updateUser);
 router.delete("/usuario/:id", authenticateToken, userController.deleteUser);
 
 export default router;
+
+////////////////////////////////////////////////////  Rotas CRUD para matérias(protegidas)
+router.post(
+    "/subject",
+    authenticateToken,
+    [
+        body("nome").notEmpty().withMessage("Nome é obrigatório"),
+        body("semestreId").isInt().withMessage("ID do semestre deve ser um número inteiro"),
+        body("professorIds").optional().isArray().withMessage("Os IDs dos professores devem ser um array de números inteiros"),
+        body("professorIds.*").isInt().withMessage("Cada ID de professor deve ser um número inteiro"),
+    ],
+    subjectController.createSubject
+);
+router.get("/subject", authenticateToken, subjectController.getSubjects);
+router.get("/subject/:id", authenticateToken, subjectController.getSubjectById);
+router.put(
+    "/subject/:id",
+    authenticateToken,
+    [
+        body("nome").notEmpty().withMessage("Nome é obrigatório"),
+        body("semestreId").isInt().withMessage("ID do semestre deve ser um número inteiro"),
+        body("professorIds").optional().isArray().withMessage("Os IDs dos professores devem ser um array de números inteiros"),
+        body("professorIds.*").isInt().withMessage("Cada ID de professor deve ser um número inteiro"),
+    ],
+    subjectController.updateSubject
+);
+router.delete("/subject/:id", authenticateToken, subjectController.deleteSubject);
