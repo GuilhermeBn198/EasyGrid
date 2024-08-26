@@ -5,7 +5,7 @@ import AppError from "../utils/AppError";
 import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 import * as semesterController from "../controllers/semester.controller";
 import * as userController from "../controllers/usuario.controller";
-import * as subjectController from './controllers/subject.controller';
+import * as subjectController from '../controllers/subject.controller';
 
 const router = Router();
 

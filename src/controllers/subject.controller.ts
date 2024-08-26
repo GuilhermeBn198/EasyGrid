@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import prisma from "../prismaClient";
+import { PrismaClient } from '@prisma/client';
 import AppError from "../utils/AppError";
+
+const prisma = new PrismaClient();
 
 export const createSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {

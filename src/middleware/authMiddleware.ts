@@ -22,7 +22,7 @@ export const authenticateToken = (
             return next(new AppError("Token inválido ou expirado", 403));
         }
         req.user = user as any; // Configuração correta dos tipos
-        console.log("Authenticated User do authMiddleware.ts:", req.user);
+        // console.log("Authenticated User do authMiddleware.ts:", req.user);
         next();
     });
 };

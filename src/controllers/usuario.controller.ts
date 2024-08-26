@@ -53,8 +53,8 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
         if (!user) {
             throw new AppError('Usuário não encontrado', 404);
         }
-        console.log("Authenticated User do usuario.controller.ts:", req.user);
-        console.log("User id recebido a partir de req.params do usuario.controller.ts:", id);
+        // console.log("Authenticated User do usuario.controller.ts:", req.user);
+        // console.log("User id recebido a partir de req.params do usuario.controller.ts:", id);
 
         res.status(200).json(user);
     } catch (error) {
