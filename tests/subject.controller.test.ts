@@ -30,12 +30,11 @@ describe("Subject CRUD", () => {
     const res = await supertest(app)
       .post("/api/subject")
       .set("Authorization", `Bearer ${coordinatorToken}`)
-      .send({ nome: "Mathematics", horario: "24M12", semestreId: 1 });
+      .send({ nome: "Mathematics", semestreId: 1 });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty("id");
     expect(res.body).toHaveProperty("nome", "Mathematics");
-    expect(res.body).toHaveProperty("horario", "24M12");
     expect(res.body).toHaveProperty("semestreId", 1);
 
     subjectId = res.body.id;
@@ -45,7 +44,7 @@ describe("Subject CRUD", () => {
     const res = await supertest(app)
       .post("/api/subject")
       .set("Authorization", `Bearer ${professorToken}`)
-      .send({ nome: "Physics", horario: "15T34", semestreId: 2 });
+      .send({ nome: "Physics", semestreId: 2 });
 
     expect(res.status).toBe(403); // Forbidden
   });
@@ -67,19 +66,17 @@ describe("Subject CRUD", () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("id", subjectId);
     expect(res.body).toHaveProperty("nome", "Mathematics");
-    expect(res.body).toHaveProperty("horario", "24M12");
   });
 
   it("should allow a coordinator to update a subject", async () => {
     const res = await supertest(app)
       .put(`/api/subject/${subjectId}`)
       .set("Authorization", `Bearer ${coordinatorToken}`)
-      .send({ nome: "Advanced Mathematics", horario: "35N34", semestreId: 1 });
+      .send({ nome: "Advanced Mathematics", semestreId: 1 });
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("id", subjectId);
     expect(res.body).toHaveProperty("nome", "Advanced Mathematics");
-    expect(res.body).toHaveProperty("horario", "35N34");
     expect(res.body).toHaveProperty("semestreId", 1);
   });
 
@@ -87,7 +84,7 @@ describe("Subject CRUD", () => {
     const res = await supertest(app)
       .put(`/api/subject/${subjectId}`)
       .set("Authorization", `Bearer ${professorToken}`)
-      .send({ nome: "Physics II", horario: "26M34", semestreId: 2 });
+      .send({ nome: "Physics II", semestreId: 2 });
 
     expect(res.status).toBe(403); // Forbidden
   });
