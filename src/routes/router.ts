@@ -92,7 +92,7 @@ router.get(
     authenticateToken,
     semesterController.getSemesterById
 );
-router.put(
+router.patch(
     "/semester/:id",
     authenticateToken,
     authorizeRole(2), // Somente Coordenadores podem criar
@@ -149,7 +149,7 @@ router.post(
 );
 router.get("/subject", authenticateToken, subjectController.getSubjects);
 router.get("/subject/:id", authenticateToken, subjectController.getSubjectById);
-router.put(
+router.patch(
     "/subject/:id",
     authenticateToken,
     [
