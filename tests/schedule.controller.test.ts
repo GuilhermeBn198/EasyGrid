@@ -40,7 +40,7 @@ describe("Schedule Creation Restrictions", () => {
         subjectId2 = subjectRes2.body.id;
     });
 
-    it("should prevent overlapping schedules for subjects in the same semester", async () => {
+    it("Erro 409: Deve impedir sobreposição de horários para matérias no mesmo semestre", async () => {
         await supertest(app)
             .post("/api/schedule")
             .set("Authorization", `Bearer ${coordinatorToken}`)
@@ -55,7 +55,7 @@ describe("Schedule Creation Restrictions", () => {
         expect(res.body.message).toMatch(/cannot overlap/);
     });
 
-    it("should prevent overlapping schedules for the same professor", async () => {
+    it("Erro 409: Deve impedir sobreposição de horários para o mesmo professor", async () => {
         await supertest(app)
             .post("/api/schedule")
             .set("Authorization", `Bearer ${coordinatorToken}`)
@@ -70,7 +70,7 @@ describe("Schedule Creation Restrictions", () => {
         expect(res.body.message).toMatch(/professor cannot have overlapping schedules/);
     });
 
-    it("should prevent assigning more than 4 different time slots to a subject", async () => {
+    it("Erro 400: Deve impedir que uma matéria seja alocada em mais de 4 horários diferentes", async () => {
         // Assign up to 4 time slots
         for (let i = 1; i <= 4; i++) {
             await supertest(app)
@@ -89,7 +89,7 @@ describe("Schedule Creation Restrictions", () => {
         expect(res.body.message).toMatch(/cannot be assigned to more than 4 different time slots/);
     });
 
-    it("should require subjects to be assigned in 2 consecutive time slots", async () => {
+    it("Erro 400: Deve exigir que as matérias sejam alocadas em 2 horários consecutivos", async () => {
         const res = await supertest(app)
             .post("/api/schedule")
             .set("Authorization", `Bearer ${coordinatorToken}`)
@@ -113,7 +113,7 @@ describe("Schedule Creation Restrictions", () => {
         expect(resCorrect.status).toBe(201); // Created
     });
 
-    it("should prevent assigning subjects to time slots after 16h", async () => {
+    it("Erro 400: Deve impedir que matérias sejam alocadas em horários após as 16h", async () => {
         const res = await supertest(app)
             .post("/api/schedule")
             .set("Authorization", `Bearer ${coordinatorToken}`)
@@ -123,7 +123,7 @@ describe("Schedule Creation Restrictions", () => {
         expect(res.body.message).toMatch(/cannot be assigned to time slots after 16h/);
     });
 
-    it("should prevent assigning subjects on Fridays and Saturdays", async () => {
+    it("Erro 400: Deve impedir que matérias sejam alocadas nas sextas e sábados", async () => {
         const resFriday = await supertest(app)
             .post("/api/schedule")
             .set("Authorization", `Bearer ${coordinatorToken}`)

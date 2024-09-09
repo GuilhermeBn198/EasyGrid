@@ -16,7 +16,7 @@ describe("User CRUD", () => {
         adminToken = adminRes.body.token;
     });
 
-    it("should create a new user", async () => {
+    it("Pass 201: Deve criar um novo usuário", async () => {
         const res = await supertest(app)
             .post("/api/usuario")
             .set("Authorization", `Bearer ${adminToken}`)
@@ -34,7 +34,7 @@ describe("User CRUD", () => {
         userId = res.body.user.id;  // Modificado para res.body.user
     });
 
-    it("should get all users", async () => {
+    it("Pass 200: Deve obter todos os usuários", async () => {
         const res = await supertest(app)
             .get("/api/usuario")
             .set("Authorization", `Bearer ${adminToken}`);
@@ -43,7 +43,7 @@ describe("User CRUD", () => {
         expect(res.body).toBeInstanceOf(Array);
     });
 
-    it("should get a user by ID", async () => {
+    it("Pass 200: Deve obter um usuário por ID", async () => {
         const res = await supertest(app)
             .get(`/api/usuario/${userId}`)
             .set("Authorization", `Bearer ${adminToken}`);
@@ -53,9 +53,9 @@ describe("User CRUD", () => {
         expect(res.body).toHaveProperty("nome", "Test User");
     });
 
-    it("should update a user", async () => {
+    it("Pass 200: Deve atualizar um usuário", async () => {
         const res = await supertest(app)
-            .put(`/api/usuario/${userId}`)
+            .patch(`/api/usuario/${userId}`)
             .set("Authorization", `Bearer ${adminToken}`)
             .send({
                 nome: "Updated User",
@@ -68,7 +68,7 @@ describe("User CRUD", () => {
         expect(res.body).toHaveProperty("nome", "Updated User");
     });
 
-    it("should delete a user", async () => {
+    it("Pass 200: Deve deletar um usuário", async () => {
         const res = await supertest(app)
             .delete(`/api/usuario/${userId}`)
             .set("Authorization", `Bearer ${adminToken}`);

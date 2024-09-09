@@ -30,7 +30,7 @@ describe("Auth Routes", () => {
             }
         });
 
-        it("Error 400: Todos os campos devem ser obrigatórios", async () => {
+        it("Erro 400: Todos os campos devem ser obrigatórios", async () => {
             const bodyRequest = {
                 email: "",
                 nome: "",
@@ -159,7 +159,7 @@ describe("Auth Routes", () => {
             }
         });
 
-        it("should grant access to protected route with valid token", async () => {
+        it("Pass 200: Deve conceder acesso à rota protegida com token válido", async () => {
             const res = await supertest(app)
                 .get("/api/protected")
                 .set("Authorization", `Bearer ${token}`);
@@ -169,7 +169,7 @@ describe("Auth Routes", () => {
             expect(res.body).toHaveProperty("user");
         });
 
-        it("should deny access to protected route with invalid token", async () => {
+        it("Erro 401: Deve negar acesso à rota protegida com token inválido", async () => {
             const res = await supertest(app)
                 .get("/api/protected")
                 .set("Authorization", "Bearer invalidtoken");
@@ -181,7 +181,7 @@ describe("Auth Routes", () => {
             );
         });
 
-        it("should deny access to protected route without token", async () => {
+        it("Erro 401: Deve negar acesso à rota protegida sem token", async () => {
             const res = await supertest(app).get("/api/protected");
 
             expect(res.status).toBe(401);

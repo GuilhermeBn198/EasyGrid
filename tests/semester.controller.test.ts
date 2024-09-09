@@ -26,7 +26,7 @@ describe("Semester CRUD", () => {
     professorToken = registerProfessorRes.body.token;
   });
 
-  it("should allow a coordinator to create a new semester", async () => {
+  it("Pass 201: Deve permitir que um coordenador crie um novo semestre", async () => {
     const res = await supertest(app)
       .post("/api/semester")
       .set("Authorization", `Bearer ${coordinatorToken}`)
@@ -40,7 +40,7 @@ describe("Semester CRUD", () => {
     semesterId = res.body.id;
   });
 
-  it("should prevent a professor from creating a new semester", async () => {
+  it("Erro 403: Deve impedir que um professor crie um novo semestre", async () => {
     const res = await supertest(app)
       .post("/api/semester")
       .set("Authorization", `Bearer ${professorToken}`)
@@ -49,7 +49,7 @@ describe("Semester CRUD", () => {
     expect(res.status).toBe(403); // Forbidden
   });
 
-  it("should allow all users to get all semesters", async () => {
+  it("Pass 200: Deve permitir que todos os usuários obtenham todos os semestres", async () => {
     const res = await supertest(app)
       .get("/api/semester")
       .set("Authorization", `Bearer ${coordinatorToken}`);
@@ -58,7 +58,7 @@ describe("Semester CRUD", () => {
     expect(res.body).toBeInstanceOf(Array);
   });
 
-  it("should allow all users to get a semester by ID", async () => {
+  it("Pass 200: Deve permitir que todos os usuários obtenham um semestre por ID", async () => {
     const res = await supertest(app)
       .get(`/api/semester/${semesterId}`)
       .set("Authorization", `Bearer ${professorToken}`);
@@ -68,9 +68,9 @@ describe("Semester CRUD", () => {
     expect(res.body).toHaveProperty("nome", "Semestre 1");
   });
 
-  it("should allow a coordinator to update a semester", async () => {
+  it("Pass 200: Deve permitir que um coordenador atualize um semestre", async () => {
     const res = await supertest(app)
-      .put(`/api/semester/${semesterId}`)
+      .patch(`/api/semester/${semesterId}`)
       .set("Authorization", `Bearer ${coordinatorToken}`)
       .send({ nome: "Semestre 3", prioridade: 3 });
 
@@ -80,7 +80,7 @@ describe("Semester CRUD", () => {
     expect(res.body).toHaveProperty("prioridade", 3);
   });
 
-  it("should prevent a professor from updating a semester", async () => {
+  it("Erro 403: Deve impedir que um professor atualize um semestre", async () => {
     const res = await supertest(app)
       .put(`/api/semester/${semesterId}`)
       .set("Authorization", `Bearer ${professorToken}`)
@@ -89,7 +89,7 @@ describe("Semester CRUD", () => {
     expect(res.status).toBe(403); // Forbidden
   });
 
-  it("should allow a coordinator to delete a semester", async () => {
+  it("Pass 200: Deve permitir que um coordenador delete um semestre", async () => {
     const res = await supertest(app)
       .delete(`/api/semester/${semesterId}`)
       .set("Authorization", `Bearer ${coordinatorToken}`);
@@ -103,7 +103,7 @@ describe("Semester CRUD", () => {
     expect(getRes.status).toBe(404);
   });
 
-  it("should prevent a professor from deleting a semester", async () => {
+  it("Erro 403: Deve impedir que um professor delete um semestre", async () => {
     const res = await supertest(app)
       .delete(`/api/semester/${semesterId}`)
       .set("Authorization", `Bearer ${professorToken}`);
