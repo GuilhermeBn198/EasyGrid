@@ -1,4 +1,5 @@
 name: tdd-git-app
+version: "1.0"
 
 services:
   app:
@@ -11,6 +12,8 @@ services:
       - ./src:/app/src
     env_file:
       - ./.env
+    depends_on:
+      - database
     networks:
       - app
 
