@@ -8,7 +8,7 @@ const app = express();
 
 // Configurar CORS
 app.use(cors({
-  origin: 'http://localhost:3000', // ou o domínio da sua aplicação frontend
+  origin:  ['http://localhost:3000', 'http://outro-dominio.com'],// ou o domínio da sua aplicação frontend
   methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
 }));
@@ -18,7 +18,7 @@ app.use('/api', router);
 
 // Middleware de manipulação de erros
 app.use(errorHandler);
-  
+
 // Initial port
 let PORT = process.env.PORT || "3000";
 
