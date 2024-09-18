@@ -82,7 +82,7 @@ describe("Semester CRUD", () => {
 
   it("Erro 403: Deve impedir que um professor atualize um semestre", async () => {
     const res = await supertest(app)
-      .put(`/api/semester/${semesterId}`)
+      .patch(`/api/semester/${semesterId}`)
       .set("Authorization", `Bearer ${professorToken}`)
       .send({ nome: "Semestre 4", prioridade: 4 });
 

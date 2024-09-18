@@ -18,7 +18,7 @@ app.use('/api', router);
 
 // Middleware de manipulação de erros
 app.use(errorHandler);
-
+  
 // Initial port
 let PORT = process.env.PORT || "3000";
 

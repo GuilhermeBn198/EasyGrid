@@ -70,7 +70,7 @@ describe("Subject CRUD", () => {
 
   it("Pass 200: Deve permitir que um coordenador atualize uma matéria", async () => {
     const res = await supertest(app)
-      .put(`/api/subject/${subjectId}`)
+      .patch(`/api/subject/${subjectId}`)
       .set("Authorization", `Bearer ${coordinatorToken}`)
       .send({ nome: "Advanced Mathematics", semestreId: 1 });
 
@@ -82,7 +82,7 @@ describe("Subject CRUD", () => {
 
   it("Erro 403: Deve impedir que um professor atualize uma matéria", async () => {
     const res = await supertest(app)
-      .put(`/api/subject/${subjectId}`)
+      .patch(`/api/subject/${subjectId}`)
       .set("Authorization", `Bearer ${professorToken}`)
       .send({ nome: "Physics II", semestreId: 2 });
 

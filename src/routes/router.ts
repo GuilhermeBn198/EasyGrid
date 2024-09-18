@@ -130,7 +130,7 @@ router.post(
 
 router.get("/usuario", authenticateToken, userController.getUsers);
 router.get("/usuario/:id", authenticateToken, userController.getUserById);
-router.put("/usuario/:id", authenticateToken, userController.updateUser);
+router.patch("/usuario/:id", authenticateToken, userController.updateUser);
 router.delete("/usuario/:id", authenticateToken, userController.deleteUser);
 
 export default router;
