@@ -1,9 +1,17 @@
 import express from 'express';
+import cors from 'cors';
 import http from 'http';
 import router from './routes/router';
 import errorHandler from './middleware/errorHandler';
 
 const app = express();
+
+// Configurar CORS
+app.use(cors({
+  origin: 'http://localhost:3000', // ou o domínio da sua aplicação frontend
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
+}));
 
 app.use(express.json());
 app.use('/api', router);
