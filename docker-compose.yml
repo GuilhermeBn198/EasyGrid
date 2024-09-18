@@ -1,6 +1,4 @@
-name: tdd-git-app
 version: "1.0"
-
 services:
   app:
     build:
@@ -10,6 +8,8 @@ services:
       - 3000:3000
     volumes:
       - ./src:/app/src
+      - ./datadump.sql:/app/datadump.sql   # Montar o arquivo SQL corretamente
+      - ./datadump.sh:/app/datadump.sh     # Montar o script corretamente
     env_file:
       - ./.env
     depends_on:

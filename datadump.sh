@@ -8,5 +8,5 @@ until pg_isready -h database -p 5432 -U postgres; do
 done
 
 echo "Populando o banco de dados..."
-# Substitua 'database.sql' pelo arquivo de dump SQL
-PGPASSWORD=postgres psql -h database -U postgres -d postgres -a -f /datadump.sql
+# Definir a senha e rodar o dump
+PGPASSWORD=postgres psql -h database -U postgres -d postgres -a -f /app/datadump.sql
