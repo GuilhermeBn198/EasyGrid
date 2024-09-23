@@ -19,23 +19,23 @@ model User {
   nome     String
   tipo     Int
   senha    String
-  materias Subject[]  @relation("UserSubjects")
+  materias Materia[]  @relation("UserMaterias")
   horarios Schedule[]
 }
 
-model Subject {
+model Materia {
   id         Int        @id @default(autoincrement())
   nome       String
   semestre   Semester   @relation(fields: [semestreId], references: [id])
   semestreId Int
   professorId Int?     // Chave estrangeira para o professor
-  professor  User?     @relation("UserSubjects", fields: [professorId], references: [id])
+  professor  User?     @relation("UserMaterias", fields: [professorId], references: [id])
   horarios   Schedule[]
 }
 
 model Schedule {
   id        Int     @id @default(autoincrement())
-  materia   Subject @relation(fields: [materiaId], references: [id])
+  materia   Materia @relation(fields: [materiaId], references: [id])
   materiaId Int
   usuario   User    @relation(fields: [usuarioId], references: [id])
   usuarioId Int
@@ -50,5 +50,5 @@ model Semester {
   id         Int       @id @default(autoincrement())
   nome       String
   prioridade Int
-  materias   Subject[]
+  materias   Materia[]
 }

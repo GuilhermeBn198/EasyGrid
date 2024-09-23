@@ -1,4 +1,4 @@
-INSERT INTO usuarios (nome, senha, tipo) VALUES
+INSERT INTO "User" (email, senha, tipo) VALUES
 ('Luciano', '12345678', 2),
 ('Marcelo Henklain', '12345678', 1),
 ('Maely', '12345678', 1);
@@ -14,7 +14,7 @@ INSERT INTO usuarios (nome, senha, tipo) VALUES
 ('Leandro Bálico', '12345678', 1);
 -- Adicionando professores
 
-INSERT INTO semestres (nome, prioridade) VALUES
+INSERT INTO "Semester" (nome, prioridade) VALUES
 ('primeiro semestre', 1),
 ('segundo semestre', 2),
 ('terceiro semestre', 3),
@@ -26,7 +26,7 @@ INSERT INTO semestres (nome, prioridade) VALUES
 ('semestre complementar', 9);
 -- Adicionando semestres
 
-INSERT INTO "Subject" (nome, semestreId, professorId) VALUES 
+INSERT INTO "Materia" (nome, semestre, professor) VALUES 
 ('DCC103-IntroduçãoaSistemasdeComputação', 1, 2),
 ('DCC104-LógicaProposicional', 1, 3),
 ('DCC105-Algoritmos', 1, 4),
