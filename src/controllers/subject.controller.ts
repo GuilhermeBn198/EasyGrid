@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import AppError from "../utils/AppError";
 
 const prisma = new PrismaClient();
 
-export const createSubject = async (req: Request, res: Response, next: NextFunction) => {
+export const createSubject = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
-        const { nome, semestreId, professorIds } = req.body;
+        const { nome, semestreId, professorId } = req.body; // Note que mudamos para singular
 
         // Verificar se o semestre existe
         const semestre = await prisma.semester.findUnique({
@@ -14,14 +18,21 @@ export const createSubject = async (req: Request, res: Response, next: NextFunct
         });
 
         if (!semestre) {
-            return next(new AppError("Semestre não encontrado ao tentar criar uma materia", 400));
+            return next(
+                new AppError(
+                    "Semestre não encontrado ao tentar criar uma materia",
+                    400
+                )
+            );
         }
 
         const subject = await prisma.subject.create({
             data: {
                 nome,
                 semestre: { connect: { id: semestreId } },
-                professores: professorIds ? { connect: professorIds.map((id: number) => ({ id })) } : undefined,
+                professor: professorId
+                    ? { connect: { id: professorId } }
+                    : undefined,
             },
         });
 
@@ -31,13 +42,16 @@ export const createSubject = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-
-export const getSubjects = async (req: Request, res: Response, next: NextFunction) => {
+export const getSubjects = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const subjects = await prisma.subject.findMany({
             include: {
                 semestre: true,
-                professores: true || false || undefined, //testar depois apenas true ou false, ou apenas true.
+                professor: true || false || undefined, //testar depois apenas true ou false, ou apenas true.
                 horarios: true,
             },
         });
@@ -48,14 +62,18 @@ export const getSubjects = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-export const getSubjectById = async (req: Request, res: Response, next: NextFunction) => {
+export const getSubjectById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { id } = req.params;
         const subject = await prisma.subject.findUnique({
             where: { id: Number(id) },
             include: {
                 semestre: true,
-                professores: true || false || undefined, //testar depois apenas true ou false, ou apenas true.
+                professor: true || false || undefined, //testar depois apenas true ou false, ou apenas true.
                 horarios: true,
             },
         });
@@ -70,17 +88,23 @@ export const getSubjectById = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const updateSubject = async (req: Request, res: Response, next: NextFunction) => {
+export const updateSubject = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { id } = req.params;
-        const { nome, semestreId, professorIds } = req.body;
+        const { nome, semestreId, professorId } = req.body; // Note que mudamos para singular
 
         const subject = await prisma.subject.update({
             where: { id: Number(id) },
             data: {
                 nome,
                 semestre: { connect: { id: semestreId } },
-                professores: professorIds ? { set: professorIds.map((id: number) => ({ id })) } : undefined,
+                professor: professorId
+                    ? { connect: { id: professorId } }
+                    : { disconnect: true },
             },
         });
 
@@ -90,7 +114,11 @@ export const updateSubject = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-export const deleteSubject = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteSubject = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { id } = req.params;
 

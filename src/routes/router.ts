@@ -160,9 +160,10 @@ router.post(
             .withMessage(
                 "Os IDs dos professores devem ser um array de números inteiros"
             ),
-        body("professorIds.*")
+        body("professorId")
+            .optional()
             .isInt()
-            .withMessage("Cada ID de professor deve ser um número inteiro"),
+            .withMessage("ID do professor deve ser um número inteiro"),
     ],
     subjectController.createSubject
 );
@@ -183,9 +184,10 @@ router.patch(
             .withMessage(
                 "Os IDs dos professores devem ser um array de números inteiros"
             ),
-        body("professorIds.*")
+        body("professorId")
+            .optional()
             .isInt()
-            .withMessage("Cada ID de professor deve ser um número inteiro"),
+            .withMessage("ID do professor deve ser um número inteiro"),
     ],
     subjectController.updateSubject
 );
@@ -196,9 +198,7 @@ router.delete(
     subjectController.deleteSubject
 );
 
-
 /////////////////////////////////////////// Rotas CRUD para Schedules
-
 
 router.post(
     "/schedules",
