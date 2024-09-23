@@ -58,8 +58,8 @@ describe("Auth Routes", () => {
     describe("POST /login", () => {
         it("Pass 200: O usuário deve ser autenticado com sucesso", async () => {
             const bodyRequest = {
-                email: "test@test.com",
-                senha: "password",
+                email: "bguilherme51@gmail.com",
+                senha: "OOOOay198!@#",
             };
             const res = await supertest(app)
                 .post("/api/login")
