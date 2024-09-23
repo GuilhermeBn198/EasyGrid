@@ -52,7 +52,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId2, dia: 2, horario: 1 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch(/cannot overlap/);
+        expect(res.body.message).toMatch(/Professor cannot have overlapping schedules/);
     });
 
     it("Erro 409: Deve impedir sobreposição de horários para o mesmo professor", async () => {
@@ -130,7 +130,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 6, horario: 1 }); // Friday
 
         expect(resFriday.status).toBe(400); // Bad Request
-        expect(resFriday.body.message).toMatch(/cannot be assigned on Fridays/);
+        expect(resFriday.body.message).toMatch(/Subjects cannot be assigned on Fridays or Saturdays/);
 
         const resSaturday = await supertest(app)
             .post("/api/schedules")
@@ -138,6 +138,6 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 7, horario: 1 }); // Saturday
 
         expect(resSaturday.status).toBe(400); // Bad Request
-        expect(resSaturday.body.message).toMatch(/cannot be assigned on Saturdays/);
+        expect(resSaturday.body.message).toMatch(/Subjects cannot be assigned on Fridays or Saturdays/);
     });
 });
