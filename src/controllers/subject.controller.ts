@@ -26,7 +26,7 @@ export const createSubject = async (
             );
         }
 
-        const subject = await prisma.subject.create({
+        const subject = await prisma.materia.create({
             data: {
                 nome,
                 semestre: { connect: { id: semestreId } },
@@ -48,7 +48,7 @@ export const getSubjects = async (
     next: NextFunction
 ) => {
     try {
-        const subjects = await prisma.subject.findMany({
+        const subjects = await prisma.materia.findMany({
             include: {
                 semestre: true,
                 professor: true || false || undefined, //testar depois apenas true ou false, ou apenas true.
@@ -69,7 +69,7 @@ export const getSubjectById = async (
 ) => {
     try {
         const { id } = req.params;
-        const subject = await prisma.subject.findUnique({
+        const subject = await prisma.materia.findUnique({
             where: { id: Number(id) },
             include: {
                 semestre: true,
@@ -97,7 +97,7 @@ export const updateSubject = async (
         const { id } = req.params;
         const { nome, semestreId, professorId } = req.body; // Note que mudamos para singular
 
-        const subject = await prisma.subject.update({
+        const subject = await prisma.materia.update({
             where: { id: Number(id) },
             data: {
                 nome,
@@ -122,7 +122,7 @@ export const deleteSubject = async (
     try {
         const { id } = req.params;
 
-        await prisma.subject.delete({
+        await prisma.materia.delete({
             where: { id: Number(id) },
         });
 
