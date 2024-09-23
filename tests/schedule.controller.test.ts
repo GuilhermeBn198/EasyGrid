@@ -28,14 +28,14 @@ describe("Schedule Creation Restrictions", () => {
         const subjectRes1 = await supertest(app)
             .post("/api/subject")
             .set("Authorization", `Bearer ${coordinatorToken}`)
-            .send({ nome: "Matéria 1", semestreId: semesterId });
+            .send({ nome: "Matéria 1", semestreId: semesterId, professorId: 2 });
 
         subjectId1 = subjectRes1.body.id;
 
         const subjectRes2 = await supertest(app)
             .post("/api/subject")
             .set("Authorization", `Bearer ${coordinatorToken}`)
-            .send({ nome: "Matéria 2", semestreId: semesterId });
+            .send({ nome: "Matéria 2", semestreId: semesterId, professorId: 2 });
 
         subjectId2 = subjectRes2.body.id;
     });
@@ -52,7 +52,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId2, dia: 2, horario: 1 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch(/Professor cannot have overlapping schedules/);
+        expect(res.body.message).toMatch("Professor cannot have overlapping schedules");
     });
 
     it("Erro 409: Deve impedir sobreposição de horários para o mesmo professor", async () => {
@@ -67,7 +67,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId2, usuarioId: 1, dia: 3, horario: 2 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch(/professor cannot have overlapping schedules/);
+        expect(res.body.message).toMatch("professor cannot have overlapping schedules");
     });
 
     it("Erro 400: Deve impedir que uma matéria seja alocada em mais de 4 horários diferentes", async () => {
@@ -86,7 +86,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 3, horario: 1 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch(/cannot be assigned to more than 4 different time slots/);
+        expect(res.body.message).toMatch("cannot be assigned to more than 4 different time slots");
     });
 
     it("Erro 400: Deve exigir que as matérias sejam alocadas em 2 horários consecutivos", async () => {
@@ -96,7 +96,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 4, horario: 1 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch(/must be assigned in 2 consecutive hours/);
+        expect(res.body.message).toMatch("must be assigned in 2 consecutive hours");
 
         // Correct consecutive assignment
         const resCorrect = await supertest(app)
@@ -120,7 +120,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 5, horario: 5 }); // 18h-19h
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch(/cannot be assigned to time slots after 16h/);
+        expect(res.body.message).toMatch("cannot be assigned to time slots after 16h");
     });
 
     it("Erro 400: Deve impedir que matérias sejam alocadas nas sextas e sábados", async () => {
@@ -130,7 +130,7 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 6, horario: 1 }); // Friday
 
         expect(resFriday.status).toBe(400); // Bad Request
-        expect(resFriday.body.message).toMatch(/Subjects cannot be assigned on Fridays or Saturdays/);
+        expect(resFriday.body.message).toMatch("Subjects cannot be assigned on Fridays or Saturdays");
 
         const resSaturday = await supertest(app)
             .post("/api/schedules")
@@ -138,6 +138,6 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId1, dia: 7, horario: 1 }); // Saturday
 
         expect(resSaturday.status).toBe(400); // Bad Request
-        expect(resSaturday.body.message).toMatch(/Subjects cannot be assigned on Fridays or Saturdays/);
+        expect(resSaturday.body.message).toMatch("Subjects cannot be assigned on Fridays or Saturdays");
     });
 });
