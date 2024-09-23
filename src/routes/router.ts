@@ -6,13 +6,12 @@ import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 import * as semesterController from "../controllers/semester.controller";
 import * as userController from "../controllers/usuario.controller";
 import * as subjectController from "../controllers/subject.controller";
+import * as scheduleController from "../controllers/schedule.controller";
 
 const router = Router();
 
-// landing page data
-// router.get('/', )
-
 //////////////////////////////////////////////////// Rotas de autenticação
+
 router.post(
     "/register",
     [
@@ -68,12 +67,14 @@ router.post(
 );
 
 //////////////////////////////////////////////////// Rotas teste de middleware
+
 router.get("/protected", authenticateToken, (req: Request, res: Response) => {
     //verificação do middleware
     res.status(200).json({ message: "Acesso concedido", user: req.user });
 });
 
 ////////////////////////////////////////////////////  Rotas CRUD para Semesters(protegidas)
+
 router.post(
     "/semester",
     authenticateToken,
@@ -112,6 +113,7 @@ router.delete(
 );
 
 /////////////////////////////////////////////////// Rotas CRUD para criação de usuarios(protegidas) por coordenadores
+
 router.post(
     "/usuario",
     authenticateToken,
@@ -142,6 +144,7 @@ router.delete(
 export default router;
 
 ////////////////////////////////////////////////////  Rotas CRUD para matérias(protegidas)
+
 router.post(
     "/subject",
     authenticateToken,
@@ -191,4 +194,29 @@ router.delete(
     authenticateToken,
     authorizeRole(2), // Somente Coordenadores podem deletar
     subjectController.deleteSubject
+);
+
+
+/////////////////////////////////////////// Rotas CRUD para Schedules
+
+
+router.post(
+    "/schedules",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem editar
+    scheduleController.createNewSchedule
+);
+router.get("/schedules", scheduleController.getAllSchedules);
+router.get("/schedules/:id", scheduleController.getScheduleById);
+router.patch(
+    "/schedules/:id",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem editar
+    scheduleController.updateScheduleById
+);
+router.delete(
+    "/schedules/:id",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem editar
+    scheduleController.deleteScheduleById
 );

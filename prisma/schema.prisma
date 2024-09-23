@@ -24,19 +24,19 @@ model User {
 }
 
 model Subject {
-  id          Int        @id @default(autoincrement())
-  nome        String
-  semestre    Semester   @relation(fields: [semestreId], references: [id])
-  semestreId  Int
-  professores User[]     @relation("UserSubjects")
-  horarios    Schedule[]
+  id         Int        @id @default(autoincrement())
+  nome       String
+  semestre   Semester   @relation(fields: [semestreId], references: [id])
+  semestreId Int
+  User       User[]     @relation("UserSubjects")
+  horarios   Schedule[]
 }
 
 model Schedule {
-  id        Int      @id @default(autoincrement())
-  materia   Subject  @relation(fields: [materiaId], references: [id])
+  id        Int     @id @default(autoincrement())
+  materia   Subject @relation(fields: [materiaId], references: [id])
   materiaId Int
-  usuario   User     @relation(fields: [usuarioId], references: [id])
+  usuario   User    @relation(fields: [usuarioId], references: [id])
   usuarioId Int
   dia       Int
   horario   Int
