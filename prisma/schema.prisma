@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,32 +9,32 @@ datasource db {
 
 model User {
   id       Int        @id @default(autoincrement())
-  email    String     @unique
+  senha    String
   nome     String
   tipo     Int
-  senha    String
+  email    String     @unique
   materias Materia[]  @relation("UserMaterias")
   horarios Schedule[]
 }
 
 model Materia {
-  id         Int        @id @default(autoincrement())
-  nome       String
-  semestre   Semester   @relation(fields: [semestreId], references: [id])
-  semestreId Int
-  professorId Int?     // Chave estrangeira para o professor
-  professor  User?     @relation("UserMaterias", fields: [professorId], references: [id])
-  horarios   Schedule[]
+  id          Int        @id @default(autoincrement())
+  nome        String
+  semestreId  Int
+  professorId Int?
+  professor   User?      @relation("UserMaterias", fields: [professorId], references: [id])
+  semestre    Semester   @relation(fields: [semestreId], references: [id])
+  horarios    Schedule[]
 }
 
 model Schedule {
   id        Int     @id @default(autoincrement())
-  materia   Materia @relation(fields: [materiaId], references: [id])
   materiaId Int
-  usuario   User    @relation(fields: [usuarioId], references: [id])
   usuarioId Int
   dia       Int
   horario   Int
+  materia   Materia @relation(fields: [materiaId], references: [id])
+  usuario   User    @relation(fields: [usuarioId], references: [id])
 
   @@unique([materiaId, dia, horario])
   @@unique([usuarioId, dia, horario])
