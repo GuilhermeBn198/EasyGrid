@@ -8,6 +8,15 @@ export const createSubject = async (req: Request, res: Response, next: NextFunct
     try {
         const { nome, semestreId, professorIds } = req.body;
 
+        // Verificar se o semestre existe
+        const semestre = await prisma.semester.findUnique({
+            where: { id: semestreId },
+        });
+
+        if (!semestre) {
+            return next(new AppError("Semestre não encontrado ao tentar criar uma materia", 400));
+        }
+
         const subject = await prisma.subject.create({
             data: {
                 nome,
@@ -21,6 +30,7 @@ export const createSubject = async (req: Request, res: Response, next: NextFunct
         next(new AppError("Erro ao criar matéria", 400));
     }
 };
+
 
 export const getSubjects = async (req: Request, res: Response, next: NextFunction) => {
     try {
