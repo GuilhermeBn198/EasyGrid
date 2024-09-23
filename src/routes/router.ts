@@ -5,7 +5,7 @@ import AppError from "../utils/AppError";
 import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 import * as semesterController from "../controllers/semester.controller";
 import * as userController from "../controllers/usuario.controller";
-import * as subjectController from '../controllers/subject.controller';
+import * as subjectController from "../controllers/subject.controller";
 
 const router = Router();
 
@@ -115,6 +115,7 @@ router.delete(
 router.post(
     "/usuario",
     authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem criar
     [
         body("email").isEmail().withMessage("Email inválido"),
         body("nome").notEmpty().withMessage("Nome é obrigatório"),
@@ -131,7 +132,12 @@ router.post(
 router.get("/usuario", authenticateToken, userController.getUsers);
 router.get("/usuario/:id", authenticateToken, userController.getUserById);
 router.patch("/usuario/:id", authenticateToken, userController.updateUser);
-router.delete("/usuario/:id", authenticateToken, userController.deleteUser);
+router.delete(
+    "/usuario/:id",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem criar
+    userController.deleteUser
+);
 
 export default router;
 
@@ -139,11 +145,21 @@ export default router;
 router.post(
     "/subject",
     authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem criar
     [
         body("nome").notEmpty().withMessage("Nome é obrigatório"),
-        body("semestreId").isInt().withMessage("ID do semestre deve ser um número inteiro"),
-        body("professorIds").optional().isArray().withMessage("Os IDs dos professores devem ser um array de números inteiros"),
-        body("professorIds.*").isInt().withMessage("Cada ID de professor deve ser um número inteiro"),
+        body("semestreId")
+            .isInt()
+            .withMessage("ID do semestre deve ser um número inteiro"),
+        body("professorIds")
+            .optional()
+            .isArray()
+            .withMessage(
+                "Os IDs dos professores devem ser um array de números inteiros"
+            ),
+        body("professorIds.*")
+            .isInt()
+            .withMessage("Cada ID de professor deve ser um número inteiro"),
     ],
     subjectController.createSubject
 );
@@ -152,12 +168,27 @@ router.get("/subject/:id", authenticateToken, subjectController.getSubjectById);
 router.patch(
     "/subject/:id",
     authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem editar
     [
         body("nome").notEmpty().withMessage("Nome é obrigatório"),
-        body("semestreId").isInt().withMessage("ID do semestre deve ser um número inteiro"),
-        body("professorIds").optional().isArray().withMessage("Os IDs dos professores devem ser um array de números inteiros"),
-        body("professorIds.*").isInt().withMessage("Cada ID de professor deve ser um número inteiro"),
+        body("semestreId")
+            .isInt()
+            .withMessage("ID do semestre deve ser um número inteiro"),
+        body("professorIds")
+            .optional()
+            .isArray()
+            .withMessage(
+                "Os IDs dos professores devem ser um array de números inteiros"
+            ),
+        body("professorIds.*")
+            .isInt()
+            .withMessage("Cada ID de professor deve ser um número inteiro"),
     ],
     subjectController.updateSubject
 );
-router.delete("/subject/:id", authenticateToken, subjectController.deleteSubject);
+router.delete(
+    "/subject/:id",
+    authenticateToken,
+    authorizeRole(2), // Somente Coordenadores podem deletar
+    subjectController.deleteSubject
+);
