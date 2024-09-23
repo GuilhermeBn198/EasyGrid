@@ -28,7 +28,8 @@ model Subject {
   nome       String
   semestre   Semester   @relation(fields: [semestreId], references: [id])
   semestreId Int
-  User       User[]     @relation("UserSubjects")
+  professorId Int?     // Chave estrangeira para o professor
+  professor  User?     @relation("UserSubjects", fields: [professorId], references: [id])
   horarios   Schedule[]
 }
 
