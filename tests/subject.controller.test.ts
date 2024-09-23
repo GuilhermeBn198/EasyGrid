@@ -8,6 +8,7 @@ describe("Subject CRUD", () => {
   let professorToken: string;
   let subjectId: number;
   let dataSemTest: { id: number; nome: string; prioridade: number };
+  let professorTest: any;
 
   beforeAll(async () => {
     // Criar um semestre para associar a matéria
@@ -31,23 +32,33 @@ describe("Subject CRUD", () => {
         senha: "password",
         tipo: 1, // Professor
     });
+
+    professorTest = registerProfessorRes.body
     professorToken = registerProfessorRes.body.token;
+
+    // Registrar uma subject anterior
+    const res = await supertest(app)
+    .post("/api/subject")
+    .set("Authorization", `Bearer ${coordinatorToken}`)
+    .send({ nome: "Mathematics", semestreId: dataSemTest.id, professorId: professorTest.user.id });
+    
+    subjectId = res.body.id;
 });
 
 
-  it("Pass 201: Deve permitir que um coordenador crie uma nova matéria", async () => {
+  it("Pass 201: Deve permitir que um coordenador crie uma nova matéria com um professor", async () => {
     const res = await supertest(app)
       .post("/api/subject")
       .set("Authorization", `Bearer ${coordinatorToken}`)
-      .send({ nome: "Mathematics", semestreId: dataSemTest.id});
+      .send({ nome: "Mathematics", semestreId: dataSemTest.id, professorId: professorTest.user.id });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty("id");
     expect(res.body).toHaveProperty("nome", "Mathematics");
     expect(res.body).toHaveProperty("semestreId", dataSemTest.id);
-
-    subjectId = res.body.id;
-  });
+    expect(res.body).toHaveProperty("professorId", professorTest.user.id);
+    
+});
 
   it("Erro 403: Deve impedir que um professor crie uma nova matéria", async () => {
     const res = await supertest(app)
@@ -61,7 +72,7 @@ describe("Subject CRUD", () => {
   it("Pass 200: Deve permitir que todos os usuários obtenham todas as matérias", async () => {
     const res = await supertest(app)
       .get("/api/subject")
-      .set("Authorization", `Bearer ${professorToken}`);
+      .set("Authorization", `Bearer ${coordinatorToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toBeInstanceOf(Array);
