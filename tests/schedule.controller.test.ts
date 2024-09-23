@@ -42,12 +42,12 @@ describe("Schedule Creation Restrictions", () => {
 
     it("Erro 409: Deve impedir sobreposição de horários para matérias no mesmo semestre", async () => {
         await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 2, horario: 1 });
 
         const res = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId2, dia: 2, horario: 1 });
 
@@ -57,12 +57,12 @@ describe("Schedule Creation Restrictions", () => {
 
     it("Erro 409: Deve impedir sobreposição de horários para o mesmo professor", async () => {
         await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, usuarioId: 1, dia: 3, horario: 2 });
 
         const res = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId2, usuarioId: 1, dia: 3, horario: 2 });
 
@@ -74,14 +74,14 @@ describe("Schedule Creation Restrictions", () => {
         // Assign up to 4 time slots
         for (let i = 1; i <= 4; i++) {
             await supertest(app)
-                .post("/api/schedule")
+                .post("/api/schedules")
                 .set("Authorization", `Bearer ${coordinatorToken}`)
                 .send({ materiaId: subjectId1, dia: 2, horario: i });
         }
 
         // Attempt to assign a 5th time slot
         const res = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 3, horario: 1 });
 
@@ -91,7 +91,7 @@ describe("Schedule Creation Restrictions", () => {
 
     it("Erro 400: Deve exigir que as matérias sejam alocadas em 2 horários consecutivos", async () => {
         const res = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 4, horario: 1 });
 
@@ -100,7 +100,7 @@ describe("Schedule Creation Restrictions", () => {
 
         // Correct consecutive assignment
         const resCorrect = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 4, horario: 1 })
             .then(() =>
@@ -115,7 +115,7 @@ describe("Schedule Creation Restrictions", () => {
 
     it("Erro 400: Deve impedir que matérias sejam alocadas em horários após as 16h", async () => {
         const res = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 5, horario: 5 }); // 18h-19h
 
@@ -125,7 +125,7 @@ describe("Schedule Creation Restrictions", () => {
 
     it("Erro 400: Deve impedir que matérias sejam alocadas nas sextas e sábados", async () => {
         const resFriday = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 6, horario: 1 }); // Friday
 
@@ -133,7 +133,7 @@ describe("Schedule Creation Restrictions", () => {
         expect(resFriday.body.message).toMatch(/cannot be assigned on Fridays/);
 
         const resSaturday = await supertest(app)
-            .post("/api/schedule")
+            .post("/api/schedules")
             .set("Authorization", `Bearer ${coordinatorToken}`)
             .send({ materiaId: subjectId1, dia: 7, horario: 1 }); // Saturday
 
