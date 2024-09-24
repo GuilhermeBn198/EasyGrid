@@ -52,7 +52,17 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId2, dia: 2, horario: 1 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch("Professor cannot have overlapping schedules");
+        expect(res.body.message).toMatch(/professor cannot have overlapping schedules/i);
+    });
+
+    it("Erro 400: Deve retornar erro se 'materiaId' não for fornecido", async () => {
+        const res = await supertest(app)
+            .post("/api/schedules")
+            .set("Authorization", `Bearer ${coordinatorToken}`)
+            .send({ usuarioId: 4, dia: 2, horario: 2 });
+    
+        expect(res.status).toBe(400); // Bad Request
+        expect(res.body.message).toMatch(/materiaId is required/i);
     });
 
     it("Erro 409: Deve impedir sobreposição de horários para o mesmo professor", async () => {
@@ -67,7 +77,8 @@ describe("Schedule Creation Restrictions", () => {
             .send({ materiaId: subjectId2, usuarioId: 1, dia: 3, horario: 2 });
 
         expect(res.status).toBe(400); // Bad Request
-        expect(res.body.message).toMatch("professor cannot have overlapping schedules");
+        expect(res.body.message.toLowerCase()).toMatch(/professor cannot have overlapping schedules/i);
+
     });
 
     it("Erro 400: Deve impedir que uma matéria seja alocada em mais de 4 horários diferentes", async () => {
