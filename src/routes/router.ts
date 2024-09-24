@@ -203,20 +203,62 @@ router.delete(
 router.post(
     "/schedules",
     authenticateToken,
-    authorizeRole(2), // Somente Coordenadores podem editar
+    authorizeRole(2), // Somente Coordenadores podem criar
+    [
+        body("materiaId")
+            .notEmpty()
+            .withMessage("ID da matéria é obrigatório")
+            .isInt()
+            .withMessage("ID da matéria deve ser um número inteiro"),
+        body("usuarioId")
+            .notEmpty()
+            .withMessage("ID do usuário é obrigatório")
+            .isInt()
+            .withMessage("ID do usuário deve ser um número inteiro"),
+        body("dia")
+            .notEmpty()
+            .withMessage("O campo 'dia' é obrigatório")
+            .isInt({ min: 1, max: 5 })
+            .withMessage("O campo 'dia' deve ser um número entre 1 e 5 (exceto sexta e sábado)"),
+        body("horario")
+            .notEmpty()
+            .withMessage("O campo 'horario' é obrigatório")
+            .isInt({ min: 1, max: 4 })
+            .withMessage("O campo 'horario' deve ser um número entre 1 e 4"),
+    ],
     scheduleController.createNewSchedule
 );
-router.get("/schedules", scheduleController.getAllSchedules);
-router.get("/schedules/:id", scheduleController.getScheduleById);
+
+router.get("/schedules", authenticateToken, scheduleController.getAllSchedules);
+router.get("/schedules/:id", authenticateToken, scheduleController.getScheduleById);
 router.patch(
     "/schedules/:id",
     authenticateToken,
     authorizeRole(2), // Somente Coordenadores podem editar
+    [
+        body("materiaId")
+            .optional()
+            .isInt()
+            .withMessage("ID da matéria deve ser um número inteiro"),
+        body("usuarioId")
+            .optional()
+            .isInt()
+            .withMessage("ID do usuário deve ser um número inteiro"),
+        body("dia")
+            .optional()
+            .isInt({ min: 1, max: 5 })
+            .withMessage("O campo 'dia' deve ser um número entre 1 e 5 (exceto sexta e sábado)"),
+        body("horario")
+            .optional()
+            .isInt({ min: 1, max: 4 })
+            .withMessage("O campo 'horario' deve ser um número entre 1 e 4"),
+    ],
     scheduleController.updateScheduleById
 );
+
 router.delete(
     "/schedules/:id",
     authenticateToken,
-    authorizeRole(2), // Somente Coordenadores podem editar
+    authorizeRole(2), // Somente Coordenadores podem deletar
     scheduleController.deleteScheduleById
 );

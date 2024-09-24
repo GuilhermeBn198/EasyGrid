@@ -6,20 +6,38 @@ import { checkScheduleRestrictions, createSchedule } from '../services/scheduleS
 
 const prisma = new PrismaClient();
 
-// Criar um novo horário
+
+// Função de criação de schedule
 export const createNewSchedule = async (req: Request, res: Response, next: NextFunction) => {
-    const { materiaId, usuarioId, dia, horario } = req.body;
-
     try {
-        // Verifica restrições antes de criar o horário
-        await checkScheduleRestrictions(materiaId, usuarioId, dia, horario);
+        const { materiaId, usuarioId, dia, horario } = req.body;
 
-        // Cria o novo horário
-        const newSchedule = await createSchedule({ materiaId, usuarioId, dia, horario });
+        // Validação de campos obrigatórios
+        if (!materiaId) {
+            return res.status(400).json({ message: "materiaId is required" });
+        }
+        if (!usuarioId) {
+            return res.status(400).json({ message: "usuarioId is required" });
+        }
+        if (!dia || dia < 1 || dia > 5) {
+            return res.status(400).json({ message: "Invalid 'dia', must be between 1 and 5" });
+        }
+        if (!horario || horario < 1 || horario > 4) {
+            return res.status(400).json({ message: "Invalid 'horario', must be between 1 and 4" });
+        }
 
-        res.status(201).json(newSchedule);
-    } catch (err: any) {
-        next(new AppError(err.message, err.statusCode || 500));
+        // Supondo que você tenha uma função de serviço para criar o schedule
+        const newSchedule = await createSchedule({
+            materiaId,
+            usuarioId,
+            dia,
+            horario,
+        });
+
+        return res.status(201).json(newSchedule);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 

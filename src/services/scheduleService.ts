@@ -4,9 +4,23 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 // Função para verificar as restrições antes de criar um horário
 export async function checkScheduleRestrictions(materiaId: number, usuarioId: number, dia: number, horario: number) {
+    // Obtenha o semestre relacionado à matéria
+    const materia = await prisma.materia.findUnique({
+        where: { id: materiaId },
+        select: { semestreId: true },
+    });
+
+    if (!materia) {
+        throw new AppError('Matéria não encontrada', 404);
+    }
+
     // Verifica sobreposição de horários para matérias no mesmo semestre
     const conflictingMateria = await prisma.schedule.findFirst({
-        where: { materiaId, dia, horario },
+        where: {
+            materia: { semestreId: materia.semestreId }, 
+            dia, 
+            horario,
+        },
     });
     if (conflictingMateria) {
         throw new AppError('Cannot overlap schedules for the same semester', 400);
@@ -48,6 +62,7 @@ export async function checkScheduleRestrictions(materiaId: number, usuarioId: nu
         throw new AppError('Subjects cannot be assigned on Fridays or Saturdays', 400);
     }
 }
+
 // Função para criar um novo horário no banco de dados
 export async function createSchedule(data: { materiaId: number, usuarioId: number, dia: number, horario: number }) {
     try {
